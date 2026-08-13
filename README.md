@@ -296,4 +296,3 @@ tighten it once you've seen a real baseline.
 ## Adding a new module
 
 See [`CLAUDE.md`](./CLAUDE.md#adding-a-new-module).
-test direct push - should be rejected
