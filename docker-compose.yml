@@ -16,5 +16,28 @@ services:
       timeout: 5s
       retries: 5
 
+  # Separate container/port/volume from the dev DB above, on purpose —
+  # `test/integration/**` truncates the whole database in every test
+  # file's `beforeEach`, which would otherwise wipe your local dev data.
+  # CI doesn't use this at all — it spins up its own ephemeral Postgres
+  # service container directly in the workflow instead.
+  postgres-test:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: tdff_test
+      POSTGRES_PASSWORD: tdff_test
+      POSTGRES_DB: tdff_test
+    ports:
+      - '5433:5432'
+    volumes:
+      - tdff_postgres_test_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U tdff_test -d tdff_test']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
 volumes:
   tdff_postgres_data:
+  tdff_postgres_test_data:

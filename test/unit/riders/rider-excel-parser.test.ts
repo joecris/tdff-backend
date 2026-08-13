@@ -65,7 +65,10 @@ describe('parseRidersExcel', () => {
   });
 
   it('combines parse-stage errors with resolution-stage errors', async () => {
-    const buffer = await buildWorkbookBuffer(['Name', 'Team Name'], [[undefined, 'Not A Real Team']]);
+    const buffer = await buildWorkbookBuffer(
+      ['Name', 'Team Name'],
+      [[undefined, 'Not A Real Team']],
+    );
 
     const result = await parseRidersExcel(buffer, teamService);
 

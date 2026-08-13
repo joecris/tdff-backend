@@ -121,7 +121,10 @@ function cellToString(value: CellValue): string | undefined {
       return text.length > 0 ? text : undefined;
     }
     if ('richText' in value && Array.isArray(value.richText)) {
-      const text = value.richText.map((part) => part.text).join('').trim();
+      const text = value.richText
+        .map((part) => part.text)
+        .join('')
+        .trim();
       return text.length > 0 ? text : undefined;
     }
   }

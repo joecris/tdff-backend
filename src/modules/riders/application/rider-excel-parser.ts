@@ -46,7 +46,11 @@ export async function parseRidersExcel(
   buffer: Buffer,
   teamService: TeamServicePort,
 ): Promise<ParseResult<ResolvedRiderImportRow>> {
-  const { valid: parsedRows, errors } = await parseWorksheetRows(buffer, riderRowSchema, RIDER_COLUMNS);
+  const { valid: parsedRows, errors } = await parseWorksheetRows(
+    buffer,
+    riderRowSchema,
+    RIDER_COLUMNS,
+  );
 
   const valid: ParsedRow<ResolvedRiderImportRow>[] = [];
   const resolutionErrors: RowError[] = [];
