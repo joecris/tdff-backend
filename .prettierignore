@@ -1,0 +1,4 @@
+# drizzle-kit generates and owns the formatting of everything under here —
+# letting Prettier reformat it just creates diff noise the next time
+# `db:generate` regenerates it in drizzle-kit's own style.
+src/infrastructure/db/migrations/

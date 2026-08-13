@@ -1,0 +1,143 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+# Cancels a superseded run on the same branch/PR — saves CI minutes when
+# someone pushes multiple times in quick succession.
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: '24'
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+      - run: npm ci
+      # Check-only — CI must never write files back, only fail if
+      # something wasn't run through `npm run format` before committing.
+      - run: npm run format:check
+
+  typecheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+      - run: npm ci
+      - run: npm run test:coverage
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage-report
+          path: coverage/
+          retention-days: 14
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+
+  # Real Drizzle adapters + DB-level constraints against an ephemeral
+  # Postgres service container — independent of docker-compose.yml (that
+  # file is for local dev only, see test/integration/README.md).
+  integration:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: tdff_test
+          POSTGRES_PASSWORD: tdff_test
+          POSTGRES_DB: tdff_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U tdff_test -d tdff_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgres://tdff_test:tdff_test@localhost:5432/tdff_test
+      NODE_ENV: test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+      - run: npm ci
+      - run: npm run db:migrate
+      - run: npm run test:integration
+
+  # Dependency vulnerability scan — see README's CI section for the
+  # one-time SNYK_TOKEN + Snyk service-account setup this depends on.
+  # Pinned to a released major-version tag, not the mutable `master` ref,
+  # for supply-chain safety.
+  snyk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+      - run: npm ci
+      - uses: snyk/actions/node@v1
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          # v1 default — a fresh dependency tree almost always has some
+          # low/medium transitive noise; start at `high` and tighten once
+          # a real baseline is known. See README's CI section.
+          args: --severity-threshold=high
+
+  # Placeholder — no real deployment target yet. Runs only after every QA
+  # gate above passes, and only for an actual push to `main` (never a PR).
+  # Replace this step with real deploy steps in a later phase.
+  deploy:
+    runs-on: ubuntu-latest
+    needs: [lint, format, typecheck, test, build, integration, snyk]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    steps:
+      - run: echo "Deployment not yet implemented — placeholder for a future CD stage."

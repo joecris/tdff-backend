@@ -78,7 +78,8 @@ export async function seedCompetitions(
     },
     {
       name: 'Stage 2 — Podium',
-      description: 'Pick the top 3 finishers of stage 2 — same "stage_winner" type as Stage 1, different slot config.',
+      description:
+        'Pick the top 3 finishers of stage 2 — same "stage_winner" type as Stage 1, different slot config.',
       type: 'stage_winner',
       fantasyLeagueId: league.id,
       slots: [

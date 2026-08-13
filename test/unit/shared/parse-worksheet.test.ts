@@ -34,7 +34,10 @@ describe('parseWorksheetRows', () => {
   });
 
   it('is case-insensitive and trims header/column matching', async () => {
-    const buffer = await buildWorkbookBuffer(['  name  ', 'LOGO URL'], [['UAE Team Emirates', ' ']]);
+    const buffer = await buildWorkbookBuffer(
+      ['  name  ', 'LOGO URL'],
+      [['UAE Team Emirates', ' ']],
+    );
 
     const result = await parseWorksheetRows(buffer, rowSchema, COLUMNS);
 
