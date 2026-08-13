@@ -1,0 +1,13 @@
+node_modules/
+dist/
+coverage/
+.env
+.env.local
+.env.*.local
+*.log
+*.tsbuildinfo
+.DS_Store
+
+# Scratch/draft input, not source of truth — see the implementation plan's
+# Context section for why (superseded by the real schema/migrations).
+tmp/
