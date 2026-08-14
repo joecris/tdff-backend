@@ -31,6 +31,16 @@ export class DrizzleUserRepository implements UserRepositoryPort {
     return row ? UserMapper.toDomain(row) : null;
   }
 
+  async findByAuth0Sub(auth0Sub: string): Promise<User | null> {
+    const [row] = await this.db
+      .select()
+      .from(usersTable)
+      .where(eq(usersTable.auth0Sub, auth0Sub))
+      .limit(1);
+
+    return row ? UserMapper.toDomain(row) : null;
+  }
+
   async save(user: User): Promise<void> {
     const row = UserMapper.toPersistence(user);
 

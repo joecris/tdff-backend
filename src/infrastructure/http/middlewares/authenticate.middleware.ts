@@ -14,7 +14,10 @@ export function authenticate(verifier: AuthVerifierPort): RequestHandler {
     verifier
       .verify(req.headers)
       .then((principal) => {
-        req.auth = principal;
+        // `req.auth` simply stays absent (not assigned `undefined`
+        // explicitly — exactOptionalPropertyTypes distinguishes the two)
+        // when the verifier resolves `null`, i.e. no credential offered.
+        if (principal) req.auth = principal;
         next();
       })
       .catch(next);

@@ -2,6 +2,10 @@ import { db } from '@infrastructure/db/client';
 import { env } from '@infrastructure/config/env';
 import { AuthVerifierPort } from '@shared/auth/auth-verifier.port';
 import { DevAuthVerifier } from '@infrastructure/auth/dev-auth-verifier';
+import {
+  Auth0JwtVerifier,
+  createJwksSigningKeyResolver,
+} from '@infrastructure/auth/auth0-jwt-verifier';
 
 import { DrizzleUserRepository } from '@modules/user/adapters/outbound/persistence/drizzle-user.repository';
 import { UserService } from '@modules/user/application/user.service';
@@ -201,8 +205,21 @@ function buildAuthVerifier(userRepository: DrizzleUserRepository): AuthVerifierP
   switch (env.AUTH_MODE) {
     case 'dev':
       return new DevAuthVerifier(userRepository);
-    case 'auth0':
-      throw new Error('AUTH_MODE=auth0 is not implemented yet — use AUTH_MODE=dev.');
+    case 'auth0': {
+      const { AUTH0_DOMAIN: domain, AUTH0_AUDIENCE: audience } = env;
+      // env.ts's cross-field .refine() already guarantees both are set
+      // whenever AUTH_MODE=auth0 — this is a defensive check documenting
+      // that invariant, not expected to ever actually throw.
+      if (!domain || !audience) {
+        throw new Error('AUTH0_DOMAIN/AUTH0_AUDIENCE missing despite AUTH_MODE=auth0');
+      }
+      return new Auth0JwtVerifier(
+        userRepository,
+        domain,
+        audience,
+        createJwksSigningKeyResolver(domain),
+      );
+    }
   }
 }
 

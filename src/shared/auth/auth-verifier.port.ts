@@ -19,7 +19,14 @@ import { AuthPrincipal } from './auth-principal';
  * `UnauthorizedError` for a present-but-invalid credential (a malformed or
  * expired token), since that's a genuine authentication failure rather
  * than "no credential was offered."
+ *
+ * `null` return means exactly "no credential was offered" — `DevAuthVerifier`
+ * never actually returns it (its no-header case has a synthetic dev-admin
+ * fallback instead), but `Auth0JwtVerifier` does, for a request with no
+ * `authorization` header at all. `authenticate.middleware.ts` maps that to
+ * `req.auth` staying `undefined`, which is what makes the `if (!req.auth)`
+ * checks already sitting in several controllers meaningful.
  */
 export interface AuthVerifierPort {
-  verify(headers: IncomingHttpHeaders): Promise<AuthPrincipal>;
+  verify(headers: IncomingHttpHeaders): Promise<AuthPrincipal | null>;
 }
