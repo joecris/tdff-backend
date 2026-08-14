@@ -132,12 +132,35 @@ jobs:
           # a real baseline is known. See README's CI section.
           args: --severity-threshold=high
 
-  # Placeholder — no real deployment target yet. Runs only after every QA
-  # gate above passes, and only for an actual push to `main` (never a PR).
-  # Replace this step with real deploy steps in a later phase.
+  # Runs only after every QA gate above passes, and only for an actual
+  # push to `main` (never a PR — feature branches/PRs never touch Vercel
+  # or the database at all). Migrations always run before the deploy step,
+  # unconditionally — drizzle-kit migrate is idempotent (tracks what's
+  # already applied, no-ops in ~1 round trip when there's nothing new), and
+  # the new code must never go live before the schema it expects does.
   deploy:
     runs-on: ubuntu-latest
     needs: [lint, format, typecheck, test, build, integration, snyk]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     steps:
-      - run: echo "Deployment not yet implemented — placeholder for a future CD stage."
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+      - run: npm ci
+      - name: Run database migrations
+        env:
+          # The Supabase *session pooler* connection string, not the app's
+          # own pooled runtime DATABASE_URL — see the plan's Phase 7.2 for
+          # why those are deliberately different connections.
+          DATABASE_URL: ${{ secrets.PROD_MIGRATE_DATABASE_URL }}
+        run: npm run db:migrate
+      - name: Deploy to Vercel (production)
+        env:
+          # No committed .vercel/project.json (gitignored, see Phase 7.3/7.5)
+          # — these two env vars are the Vercel CLI's own documented
+          # alternative for CI use.
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        run: npx vercel deploy --prod --yes --token="${{ secrets.VERCEL_TOKEN }}"
