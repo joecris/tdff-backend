@@ -21,6 +21,13 @@ export class FakeUserRepository implements UserRepositoryPort {
     return null;
   }
 
+  async findByAuth0Sub(auth0Sub: string): Promise<User | null> {
+    for (const user of this.usersById.values()) {
+      if (user.auth0Sub === auth0Sub) return user;
+    }
+    return null;
+  }
+
   async save(user: User): Promise<void> {
     this.usersById.set(user.id, user);
   }

@@ -9,6 +9,9 @@ import { User } from '../entities/user.entity';
 export interface UserRepositoryPort {
   findById(id: string): Promise<User | null>;
   findByEmail(email: string): Promise<User | null>;
+  /** Exists for Auth0 JIT-provisioning (Phase 7.1) — looks up the local
+   * user linked to a verified JWT's `sub` claim. */
+  findByAuth0Sub(auth0Sub: string): Promise<User | null>;
   save(user: User): Promise<void>;
 }
 
