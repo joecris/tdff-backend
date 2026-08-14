@@ -2,3 +2,8 @@
 # letting Prettier reformat it just creates diff noise the next time
 # `db:generate` regenerates it in drizzle-kit's own style.
 src/infrastructure/db/migrations/
+
+# generate-spec.ts owns this file's formatting (plain JSON.stringify) —
+# same reasoning as the migrations above. `openapi:check` (see ci.yml's
+# `openapi` job) is what actually gates it, not `format:check`.
+openapi.json

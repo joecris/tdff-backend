@@ -1,15 +1,17 @@
+import { z } from 'zod';
 import { GrandTour } from '../../../../domain/entities/grand-tour.entity';
 import { formatDdMmYyyy } from '@shared/utils/date-format';
 
-export interface GrandTourResponseDto {
-  id: string;
-  name: string;
-  description?: string;
-  startDate?: string;
-  endDate?: string;
-  createdAt: string;
-  updatedAt: string;
-}
+export const grandTourResponseSchema = z.object({
+  id: z.uuid(),
+  name: z.string(),
+  description: z.string().optional(),
+  startDate: z.string().describe('DD-MM-YYYY').optional(),
+  endDate: z.string().describe('DD-MM-YYYY').optional(),
+  createdAt: z.iso.datetime(),
+  updatedAt: z.iso.datetime(),
+});
+export type GrandTourResponseDto = z.infer<typeof grandTourResponseSchema>;
 
 export function toGrandTourResponseDto(grandTour: GrandTour): GrandTourResponseDto {
   return {

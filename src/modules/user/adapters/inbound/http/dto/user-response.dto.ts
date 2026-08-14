@@ -1,14 +1,19 @@
-import { User, UserRole } from '../../../../domain/entities/user.entity';
+import { z } from 'zod';
+import { User } from '../../../../domain/entities/user.entity';
 
-export interface UserResponseDto {
-  id: string;
-  email: string;
-  name: string;
-  role: UserRole;
-  pictureUrl?: string;
-  createdAt: string;
-  updatedAt: string;
-}
+// Mirrors `UserRole` (`src/shared/auth/role.ts`) — hardcoded rather than
+// derived because Zod enums need literal values, not a type; update both
+// together if a role is ever added.
+export const userResponseSchema = z.object({
+  id: z.uuid(),
+  email: z.email(),
+  name: z.string(),
+  role: z.enum(['user', 'admin']),
+  pictureUrl: z.string().optional(),
+  createdAt: z.iso.datetime(),
+  updatedAt: z.iso.datetime(),
+});
+export type UserResponseDto = z.infer<typeof userResponseSchema>;
 
 export function toUserResponseDto(user: User): UserResponseDto {
   return {

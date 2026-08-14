@@ -1,12 +1,14 @@
+import { z } from 'zod';
 import { FantasyLeagueMember } from '../../../../domain/entities/fantasy-league-member.entity';
 
-export interface FantasyLeagueMemberResponseDto {
-  id: string;
-  fantasyLeagueId: string;
-  userId: string;
-  role: string;
-  joinedAt: string;
-}
+export const fantasyLeagueMemberResponseSchema = z.object({
+  id: z.uuid(),
+  fantasyLeagueId: z.uuid(),
+  userId: z.uuid(),
+  role: z.string(),
+  joinedAt: z.iso.datetime(),
+});
+export type FantasyLeagueMemberResponseDto = z.infer<typeof fantasyLeagueMemberResponseSchema>;
 
 export function toFantasyLeagueMemberResponseDto(
   member: FantasyLeagueMember,

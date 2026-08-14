@@ -1,12 +1,14 @@
+import { z } from 'zod';
 import { GrandTourRider } from '../../../../domain/entities/grand-tour-rider.entity';
 
-export interface GrandTourRiderResponseDto {
-  id: string;
-  grandTourId: string;
-  riderId: string;
-  createdAt: string;
-  updatedAt: string;
-}
+export const grandTourRiderResponseSchema = z.object({
+  id: z.uuid(),
+  grandTourId: z.uuid(),
+  riderId: z.uuid(),
+  createdAt: z.iso.datetime(),
+  updatedAt: z.iso.datetime(),
+});
+export type GrandTourRiderResponseDto = z.infer<typeof grandTourRiderResponseSchema>;
 
 export function toGrandTourRiderResponseDto(
   grandTourRider: GrandTourRider,

@@ -1,20 +1,25 @@
+import { z } from 'zod';
 import { CompetitionResult } from '../../../../domain/entities/competition-result.entity';
 
-export interface CompetitionResultSelectionResponseDto {
-  slot: string;
-  grandTourRiderId?: string;
-  grandTourTeamId?: string;
-}
+export const competitionResultSelectionResponseSchema = z.object({
+  slot: z.string(),
+  grandTourRiderId: z.uuid().optional(),
+  grandTourTeamId: z.uuid().optional(),
+});
+export type CompetitionResultSelectionResponseDto = z.infer<
+  typeof competitionResultSelectionResponseSchema
+>;
 
-export interface CompetitionResultResponseDto {
-  id: string;
-  competitionId: string;
-  submittedByUserId?: string;
-  selections: CompetitionResultSelectionResponseDto[];
-  submittedAt: string;
-  createdAt: string;
-  updatedAt: string;
-}
+export const competitionResultResponseSchema = z.object({
+  id: z.uuid(),
+  competitionId: z.uuid(),
+  submittedByUserId: z.uuid().optional(),
+  selections: z.array(competitionResultSelectionResponseSchema),
+  submittedAt: z.iso.datetime(),
+  createdAt: z.iso.datetime(),
+  updatedAt: z.iso.datetime(),
+});
+export type CompetitionResultResponseDto = z.infer<typeof competitionResultResponseSchema>;
 
 export function toCompetitionResultResponseDto(
   result: CompetitionResult,

@@ -1,16 +1,18 @@
+import { z } from 'zod';
 import { FantasyLeague } from '../../../../domain/entities/fantasy-league.entity';
 import { formatDdMmYyyy } from '@shared/utils/date-format';
 
-export interface FantasyLeagueResponseDto {
-  id: string;
-  name: string;
-  description?: string;
-  grandTourId: string;
-  startDate?: string;
-  endDate?: string;
-  createdAt: string;
-  updatedAt: string;
-}
+export const fantasyLeagueResponseSchema = z.object({
+  id: z.uuid(),
+  name: z.string(),
+  description: z.string().optional(),
+  grandTourId: z.uuid(),
+  startDate: z.string().describe('DD-MM-YYYY').optional(),
+  endDate: z.string().describe('DD-MM-YYYY').optional(),
+  createdAt: z.iso.datetime(),
+  updatedAt: z.iso.datetime(),
+});
+export type FantasyLeagueResponseDto = z.infer<typeof fantasyLeagueResponseSchema>;
 
 export function toFantasyLeagueResponseDto(fantasyLeague: FantasyLeague): FantasyLeagueResponseDto {
   return {

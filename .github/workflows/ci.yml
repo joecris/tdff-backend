@@ -78,6 +78,22 @@ jobs:
       - run: npm ci
       - run: npm run build
 
+  # Regenerates openapi.json from the current routes/DTOs and fails if it
+  # doesn't match what's committed — same shape as `format`'s check-only
+  # gate. This is what actually makes the spec "living" rather than
+  # aspirational: a route/DTO change without a regenerated, committed
+  # openapi.json fails CI. See the plan's Phase 8.
+  openapi:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+      - run: npm ci
+      - run: npm run openapi:check
+
   # Real Drizzle adapters + DB-level constraints against an ephemeral
   # Postgres service container — independent of docker-compose.yml (that
   # file is for local dev only, see test/integration/README.md).
@@ -140,7 +156,7 @@ jobs:
   # the new code must never go live before the schema it expects does.
   deploy:
     runs-on: ubuntu-latest
-    needs: [lint, format, typecheck, test, build, integration, snyk]
+    needs: [lint, format, typecheck, test, build, integration, snyk, openapi]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     steps:
       - uses: actions/checkout@v4
