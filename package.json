@@ -36,7 +36,6 @@
     "express-rate-limit": "^8.6.2",
     "helmet": "^8.3.0",
     "jsonwebtoken": "^9.0.3",
-    "jwks-rsa": "^4.1.0",
     "multer": "^2.2.0",
     "pg": "^8.22.0",
     "pino": "^10.3.1",
@@ -65,6 +64,7 @@
     "tsc-alias": "^1.9.1",
     "tsconfig-paths": "^4.2.0",
     "typescript": "^6.0.3",
+    "vercel": "^59.0.0",
     "vite-tsconfig-paths": "^6.1.1",
     "vitest": "^4.1.10"
   }
