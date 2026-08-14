@@ -1,7 +1,6 @@
 import type { IncomingHttpHeaders } from 'node:http';
-import { randomUUID } from 'node:crypto';
+import { randomUUID, createPublicKey, webcrypto } from 'node:crypto';
 import jwt, { JwtPayload } from 'jsonwebtoken';
-import { JwksClient } from 'jwks-rsa';
 import { AuthVerifierPort } from '@shared/auth/auth-verifier.port';
 import { AuthPrincipal } from '@shared/auth/auth-principal';
 import { UnauthorizedError } from '@shared/errors/app-error';
@@ -16,13 +15,66 @@ const BEARER_PREFIX = 'Bearer ';
  * `createJwksSigningKeyResolver` below for the production implementation. */
 export type SigningKeyResolver = (kid: string) => Promise<string>;
 
-/** Real production resolver — wraps `jwks-rsa`'s client (which caches keys
- * itself) against Auth0's well-known JWKS endpoint for this tenant. */
+interface Jwk extends webcrypto.JsonWebKey {
+  kid?: string;
+}
+
+const JWKS_CACHE_TTL_MS = 10 * 60 * 1000;
+
+/**
+ * Real production resolver — fetches Auth0's JWKS document and converts
+ * the matching JWK to a PEM public key, using only Node's built-in
+ * `fetch`/`crypto` (no `jwks-rsa`). That package pulls in `jose`, which
+ * ships ESM-only in recent versions and breaks under `require()` in
+ * Vercel's Node runtime (`ERR_REQUIRE_ESM`) — found via a real deploy,
+ * not a hypothetical. `crypto.createPublicKey({ format: 'jwk', ... })`
+ * does the exact same JWK->PEM conversion `jwks-rsa` was doing for us,
+ * built into Node since well before this project's minimum version.
+ *
+ * Caches the fetched key set for `JWKS_CACHE_TTL_MS`, reused across warm
+ * invocations of the same function instance (module-scope state, same
+ * principle as `client.ts`'s singleton pool). A `kid` miss forces one
+ * cache refresh before giving up, to ride out Auth0 rotating its signing
+ * keys without waiting out the full TTL.
+ */
 export function createJwksSigningKeyResolver(domain: string): SigningKeyResolver {
-  const client = new JwksClient({ jwksUri: `https://${domain}/.well-known/jwks.json` });
+  let cache: { keys: Map<string, string>; fetchedAt: number } | null = null;
+
+  async function fetchKeys(): Promise<Map<string, string>> {
+    const response = await fetch(`https://${domain}/.well-known/jwks.json`);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch JWKS for "${domain}": HTTP ${response.status}`);
+    }
+    const body = (await response.json()) as { keys: Jwk[] };
+
+    const keys = new Map<string, string>();
+    for (const jwk of body.keys) {
+      if (!jwk.kid) continue;
+      const pem = createPublicKey({ format: 'jwk', key: jwk }).export({
+        type: 'spki',
+        format: 'pem',
+      });
+      keys.set(jwk.kid, pem.toString());
+    }
+    return keys;
+  }
+
   return async (kid: string) => {
-    const key = await client.getSigningKey(kid);
-    return key.getPublicKey();
+    if (!cache || Date.now() - cache.fetchedAt > JWKS_CACHE_TTL_MS) {
+      cache = { keys: await fetchKeys(), fetchedAt: Date.now() };
+    }
+
+    const key = cache.keys.get(kid) ?? (await refreshAndFind());
+    return key;
+
+    async function refreshAndFind(): Promise<string> {
+      cache = { keys: await fetchKeys(), fetchedAt: Date.now() };
+      const refreshed = cache.keys.get(kid);
+      if (!refreshed) {
+        throw new Error(`No signing key found for kid "${kid}"`);
+      }
+      return refreshed;
+    }
   };
 }
 
