@@ -1,12 +1,14 @@
+import { z } from 'zod';
 import { Team } from '../../../../domain/entities/team.entity';
 
-export interface TeamResponseDto {
-  id: string;
-  name: string;
-  logoUrl?: string;
-  createdAt: string;
-  updatedAt: string;
-}
+export const teamResponseSchema = z.object({
+  id: z.uuid(),
+  name: z.string(),
+  logoUrl: z.string().optional(),
+  createdAt: z.iso.datetime(),
+  updatedAt: z.iso.datetime(),
+});
+export type TeamResponseDto = z.infer<typeof teamResponseSchema>;
 
 export function toTeamResponseDto(team: Team): TeamResponseDto {
   return {

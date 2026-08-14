@@ -1,21 +1,24 @@
+import { z } from 'zod';
 import { Competition } from '../../../../domain/entities/competition.entity';
 
-export interface CompetitionSlotConfigResponseDto {
-  slot: string;
-  points: number;
-}
+export const competitionSlotConfigResponseSchema = z.object({
+  slot: z.string(),
+  points: z.number().int(),
+});
+export type CompetitionSlotConfigResponseDto = z.infer<typeof competitionSlotConfigResponseSchema>;
 
-export interface CompetitionResponseDto {
-  id: string;
-  name: string;
-  description?: string;
-  type: string;
-  fantasyLeagueId: string;
-  entryLockAt?: string;
-  slots: CompetitionSlotConfigResponseDto[];
-  createdAt: string;
-  updatedAt: string;
-}
+export const competitionResponseSchema = z.object({
+  id: z.uuid(),
+  name: z.string(),
+  description: z.string().optional(),
+  type: z.string(),
+  fantasyLeagueId: z.uuid(),
+  entryLockAt: z.iso.datetime().optional(),
+  slots: z.array(competitionSlotConfigResponseSchema),
+  createdAt: z.iso.datetime(),
+  updatedAt: z.iso.datetime(),
+});
+export type CompetitionResponseDto = z.infer<typeof competitionResponseSchema>;
 
 export function toCompetitionResponseDto(competition: Competition): CompetitionResponseDto {
   return {

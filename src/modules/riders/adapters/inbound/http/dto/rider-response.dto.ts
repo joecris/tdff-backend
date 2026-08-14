@@ -1,15 +1,17 @@
+import { z } from 'zod';
 import { Rider } from '../../../../domain/entities/rider.entity';
 
-export interface RiderResponseDto {
-  id: string;
-  name: string;
-  nationality?: string;
-  imageUrl?: string;
-  type?: string;
-  teamId?: string;
-  createdAt: string;
-  updatedAt: string;
-}
+export const riderResponseSchema = z.object({
+  id: z.uuid(),
+  name: z.string(),
+  nationality: z.string().optional(),
+  imageUrl: z.string().optional(),
+  type: z.string().optional(),
+  teamId: z.uuid().optional(),
+  createdAt: z.iso.datetime(),
+  updatedAt: z.iso.datetime(),
+});
+export type RiderResponseDto = z.infer<typeof riderResponseSchema>;
 
 export function toRiderResponseDto(rider: Rider): RiderResponseDto {
   return {

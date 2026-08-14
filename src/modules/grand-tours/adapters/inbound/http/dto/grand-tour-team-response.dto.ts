@@ -1,12 +1,14 @@
+import { z } from 'zod';
 import { GrandTourTeam } from '../../../../domain/entities/grand-tour-team.entity';
 
-export interface GrandTourTeamResponseDto {
-  id: string;
-  grandTourId: string;
-  teamId: string;
-  createdAt: string;
-  updatedAt: string;
-}
+export const grandTourTeamResponseSchema = z.object({
+  id: z.uuid(),
+  grandTourId: z.uuid(),
+  teamId: z.uuid(),
+  createdAt: z.iso.datetime(),
+  updatedAt: z.iso.datetime(),
+});
+export type GrandTourTeamResponseDto = z.infer<typeof grandTourTeamResponseSchema>;
 
 export function toGrandTourTeamResponseDto(grandTourTeam: GrandTourTeam): GrandTourTeamResponseDto {
   return {

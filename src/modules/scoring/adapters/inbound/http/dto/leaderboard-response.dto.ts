@@ -1,11 +1,13 @@
+import { z } from 'zod';
 import { LeagueLeaderboardEntry } from '../../../../domain/entities/league-leaderboard-entry.entity';
 
-export interface LeaderboardEntryResponseDto {
-  userId: string;
-  totalScore: number;
-  rank: number;
-  calculatedAt: string;
-}
+export const leaderboardEntryResponseSchema = z.object({
+  userId: z.uuid(),
+  totalScore: z.number(),
+  rank: z.number().int(),
+  calculatedAt: z.iso.datetime(),
+});
+export type LeaderboardEntryResponseDto = z.infer<typeof leaderboardEntryResponseSchema>;
 
 export function toLeaderboardEntryResponseDto(
   entry: LeagueLeaderboardEntry,
