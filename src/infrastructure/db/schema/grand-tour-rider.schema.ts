@@ -22,7 +22,7 @@ export const grandTourRidersTable = pgTable(
     ),
     index('grand_tour_riders_rider_id_idx').on(table.riderId),
   ],
-);
+).enableRLS();
 
 export type GrandTourRiderRow = typeof grandTourRidersTable.$inferSelect;
 export type NewGrandTourRiderRow = typeof grandTourRidersTable.$inferInsert;

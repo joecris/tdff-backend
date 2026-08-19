@@ -28,7 +28,7 @@ export const competitionSlotConfigsTable = pgTable(
       table.slot,
     ),
   ],
-);
+).enableRLS();
 
 export type CompetitionSlotConfigRow = typeof competitionSlotConfigsTable.$inferSelect;
 export type NewCompetitionSlotConfigRow = typeof competitionSlotConfigsTable.$inferInsert;

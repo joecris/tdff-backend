@@ -25,7 +25,7 @@ export const competitionsTable = pgTable(
     updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
   },
   (table) => [index('competitions_fantasy_league_id_idx').on(table.fantasyLeagueId)],
-);
+).enableRLS();
 
 export type CompetitionRow = typeof competitionsTable.$inferSelect;
 export type NewCompetitionRow = typeof competitionsTable.$inferInsert;

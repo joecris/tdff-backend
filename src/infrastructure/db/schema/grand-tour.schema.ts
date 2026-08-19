@@ -8,7 +8,7 @@ export const grandToursTable = pgTable('grand_tours', {
   endDate: date('end_date', { mode: 'date' }),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
-});
+}).enableRLS();
 
 export type GrandTourRow = typeof grandToursTable.$inferSelect;
 export type NewGrandTourRow = typeof grandToursTable.$inferInsert;

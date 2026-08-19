@@ -27,7 +27,7 @@ export const leagueLeaderboardEntriesTable = pgTable(
     ),
     index('league_leaderboard_entries_fantasy_league_id_idx').on(table.fantasyLeagueId),
   ],
-);
+).enableRLS();
 
 export type LeagueLeaderboardEntryRow = typeof leagueLeaderboardEntriesTable.$inferSelect;
 export type NewLeagueLeaderboardEntryRow = typeof leagueLeaderboardEntriesTable.$inferInsert;

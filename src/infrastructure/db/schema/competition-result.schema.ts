@@ -15,7 +15,7 @@ export const competitionResultsTable = pgTable('competition_results', {
   submittedAt: timestamp('submitted_at', { withTimezone: true }).notNull().defaultNow(),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
-});
+}).enableRLS();
 
 export type CompetitionResultRow = typeof competitionResultsTable.$inferSelect;
 export type NewCompetitionResultRow = typeof competitionResultsTable.$inferInsert;
