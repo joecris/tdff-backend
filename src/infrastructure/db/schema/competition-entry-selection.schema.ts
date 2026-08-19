@@ -33,7 +33,7 @@ export const competitionEntrySelectionsTable = pgTable(
       sql`(${table.grandTourRiderId} is not null) != (${table.grandTourTeamId} is not null)`,
     ),
   ],
-);
+).enableRLS();
 
 export type CompetitionEntrySelectionRow = typeof competitionEntrySelectionsTable.$inferSelect;
 export type NewCompetitionEntrySelectionRow = typeof competitionEntrySelectionsTable.$inferInsert;

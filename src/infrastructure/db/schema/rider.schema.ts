@@ -16,7 +16,7 @@ export const ridersTable = pgTable(
     updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
   },
   (table) => [index('riders_team_id_idx').on(table.teamId)],
-);
+).enableRLS();
 
 export type RiderRow = typeof ridersTable.$inferSelect;
 export type NewRiderRow = typeof ridersTable.$inferInsert;

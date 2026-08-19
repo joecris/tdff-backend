@@ -16,7 +16,7 @@ export const fantasyLeaguesTable = pgTable(
     updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
   },
   (table) => [index('fantasy_leagues_grand_tour_id_idx').on(table.grandTourId)],
-);
+).enableRLS();
 
 export type FantasyLeagueRow = typeof fantasyLeaguesTable.$inferSelect;
 export type NewFantasyLeagueRow = typeof fantasyLeaguesTable.$inferInsert;

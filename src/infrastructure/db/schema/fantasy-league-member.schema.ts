@@ -31,7 +31,7 @@ export const fantasyLeagueMembersTable = pgTable(
     ),
     index('fantasy_league_members_user_id_idx').on(table.userId),
   ],
-);
+).enableRLS();
 
 export type FantasyLeagueMemberRow = typeof fantasyLeagueMembersTable.$inferSelect;
 export type NewFantasyLeagueMemberRow = typeof fantasyLeagueMembersTable.$inferInsert;

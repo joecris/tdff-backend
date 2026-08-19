@@ -24,7 +24,7 @@ export const competitionEntriesTable = pgTable(
     ),
     index('competition_entries_user_id_idx').on(table.userId),
   ],
-);
+).enableRLS();
 
 export type CompetitionEntryRow = typeof competitionEntriesTable.$inferSelect;
 export type NewCompetitionEntryRow = typeof competitionEntriesTable.$inferInsert;

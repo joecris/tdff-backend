@@ -32,7 +32,7 @@ export const competitionEntryScoresTable = pgTable(
     index('competition_entry_scores_competition_id_idx').on(table.competitionId),
     index('competition_entry_scores_user_id_idx').on(table.userId),
   ],
-);
+).enableRLS();
 
 export type CompetitionEntryScoreRow = typeof competitionEntryScoresTable.$inferSelect;
 export type NewCompetitionEntryScoreRow = typeof competitionEntryScoresTable.$inferInsert;

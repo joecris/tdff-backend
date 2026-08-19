@@ -19,7 +19,7 @@ export const grandTourTeamsTable = pgTable(
     uniqueIndex('grand_tour_teams_grand_tour_id_team_id_idx').on(table.grandTourId, table.teamId),
     index('grand_tour_teams_team_id_idx').on(table.teamId),
   ],
-);
+).enableRLS();
 
 export type GrandTourTeamRow = typeof grandTourTeamsTable.$inferSelect;
 export type NewGrandTourTeamRow = typeof grandTourTeamsTable.$inferInsert;
