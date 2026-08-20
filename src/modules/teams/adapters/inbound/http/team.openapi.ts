@@ -5,8 +5,9 @@ import {
   standardErrorResponses,
   bulkImportResultSchema,
 } from '@infrastructure/openapi/registry';
+import { paginationQuerySchema } from '@shared/http/pagination.dto';
 import { createTeamSchema } from './dto/create-team.dto';
-import { teamResponseSchema } from './dto/team-response.dto';
+import { teamResponseSchema, paginatedTeamResponseSchema } from './dto/team-response.dto';
 
 registry.registerPath({
   method: 'post',
@@ -25,6 +26,24 @@ registry.registerPath({
       content: { 'application/json': { schema: teamResponseSchema } },
     },
     ...standardErrorResponses([400, 401, 403]),
+  },
+});
+
+registry.registerPath({
+  method: 'get',
+  path: '/api/teams',
+  operationId: 'listTeams',
+  tags: ['Teams'],
+  summary: 'List teams (paginated)',
+  security: [],
+  description: 'Defaults to 50 items/page (max 100).',
+  request: { query: paginationQuerySchema },
+  responses: {
+    200: {
+      description: 'A page of teams',
+      content: { 'application/json': { schema: paginatedTeamResponseSchema } },
+    },
+    ...standardErrorResponses([400]),
   },
 });
 

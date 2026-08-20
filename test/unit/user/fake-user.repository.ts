@@ -1,5 +1,7 @@
 import { User } from '@modules/user/domain/entities/user.entity';
 import { UserRepositoryPort } from '@modules/user/domain/ports/user-repository.port';
+import { PaginationParams } from '@shared/domain/pagination';
+import { paginateFake } from '../shared/paginate-fake';
 
 /**
  * In-memory fake implementing the same port the Drizzle adapter implements.
@@ -26,6 +28,10 @@ export class FakeUserRepository implements UserRepositoryPort {
       if (user.auth0Sub === auth0Sub) return user;
     }
     return null;
+  }
+
+  async findMany(params: PaginationParams): Promise<{ items: User[]; total: number }> {
+    return paginateFake([...this.usersById.values()], params, (u) => u.createdAt);
   }
 
   async save(user: User): Promise<void> {

@@ -1,8 +1,12 @@
 import { RequestHandler } from 'express';
 import { FantasyLeagueServicePort } from '../../../domain/ports/fantasy-league-service.port';
 import { UnauthorizedError } from '@shared/errors/app-error';
+import { PaginationParams } from '@shared/domain/pagination';
 import { CreateFantasyLeagueDto } from './dto/create-fantasy-league.dto';
-import { toFantasyLeagueResponseDto } from './dto/fantasy-league-response.dto';
+import {
+  toFantasyLeagueResponseDto,
+  toPaginatedFantasyLeagueResponseDto,
+} from './dto/fantasy-league-response.dto';
 import { toFantasyLeagueMemberResponseDto } from './dto/fantasy-league-member-response.dto';
 
 export class FantasyLeagueController {
@@ -30,6 +34,17 @@ export class FantasyLeagueController {
         req.params.id as string,
       );
       res.status(200).json(toFantasyLeagueResponseDto(fantasyLeague));
+    } catch (err) {
+      next(err);
+    }
+  };
+
+  list: RequestHandler = async (req, res, next) => {
+    try {
+      const result = await this.fantasyLeagueService.listFantasyLeagues(
+        req.pagination as PaginationParams,
+      );
+      res.status(200).json(toPaginatedFantasyLeagueResponseDto(result));
     } catch (err) {
       next(err);
     }

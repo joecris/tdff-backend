@@ -1,9 +1,10 @@
-import { eq } from 'drizzle-orm';
+import { count, desc, eq } from 'drizzle-orm';
 import { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import { GrandTour } from '../../../domain/entities/grand-tour.entity';
 import { GrandTourRepositoryPort } from '../../../domain/ports/grand-tour-repository.port';
 import { grandToursTable } from '@infrastructure/db/schema/grand-tour.schema';
 import * as schema from '@infrastructure/db/schema';
+import { PaginationParams } from '@shared/domain/pagination';
 import { GrandTourMapper } from './mappers/grand-tour.mapper';
 
 /**
@@ -23,6 +24,21 @@ export class DrizzleGrandTourRepository implements GrandTourRepositoryPort {
       .limit(1);
 
     return row ? GrandTourMapper.toDomain(row) : null;
+  }
+
+  async findMany(params: PaginationParams): Promise<{ items: GrandTour[]; total: number }> {
+    const offset = (params.page - 1) * params.limit;
+    const [rows, [totalRow]] = await Promise.all([
+      this.db
+        .select()
+        .from(grandToursTable)
+        .orderBy(desc(grandToursTable.createdAt))
+        .limit(params.limit)
+        .offset(offset),
+      this.db.select({ value: count() }).from(grandToursTable),
+    ]);
+
+    return { items: rows.map(GrandTourMapper.toDomain), total: totalRow?.value ?? 0 };
   }
 
   async save(grandTour: GrandTour): Promise<void> {

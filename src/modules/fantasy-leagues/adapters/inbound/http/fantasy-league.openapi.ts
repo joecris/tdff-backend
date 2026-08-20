@@ -1,7 +1,11 @@
 import { z } from 'zod';
 import { registry, idPathParam, standardErrorResponses } from '@infrastructure/openapi/registry';
+import { paginationQuerySchema } from '@shared/http/pagination.dto';
 import { createFantasyLeagueSchema } from './dto/create-fantasy-league.dto';
-import { fantasyLeagueResponseSchema } from './dto/fantasy-league-response.dto';
+import {
+  fantasyLeagueResponseSchema,
+  paginatedFantasyLeagueResponseSchema,
+} from './dto/fantasy-league-response.dto';
 import { fantasyLeagueMemberResponseSchema } from './dto/fantasy-league-member-response.dto';
 // Cross-module import for docs purposes only — this route is mounted here
 // (`/fantasy-leagues/:id/leaderboard`) even though the computation lives
@@ -28,6 +32,24 @@ registry.registerPath({
       content: { 'application/json': { schema: fantasyLeagueResponseSchema } },
     },
     ...standardErrorResponses([400, 401, 403, 404]),
+  },
+});
+
+registry.registerPath({
+  method: 'get',
+  path: '/api/fantasy-leagues',
+  operationId: 'listFantasyLeagues',
+  tags: ['Fantasy Leagues'],
+  summary: 'List fantasy leagues (paginated)',
+  security: [],
+  description: 'Defaults to 50 items/page (max 100).',
+  request: { query: paginationQuerySchema },
+  responses: {
+    200: {
+      description: 'A page of fantasy leagues',
+      content: { 'application/json': { schema: paginatedFantasyLeagueResponseSchema } },
+    },
+    ...standardErrorResponses([400]),
   },
 });
 

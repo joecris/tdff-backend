@@ -1,6 +1,8 @@
 import { Router } from 'express';
 import { validateBody } from '@infrastructure/http/middlewares/validate.middleware';
+import { validateQuery } from '@infrastructure/http/middlewares/validate-query.middleware';
 import { requireRole } from '@infrastructure/http/middlewares/require-role.middleware';
+import { paginationQuerySchema } from '@shared/http/pagination.dto';
 import { CompetitionController } from './competition.controller';
 import { ScoringController } from '@modules/scoring/adapters/inbound/http/scoring.controller';
 import { createCompetitionSchema } from './dto/create-competition.dto';
@@ -16,6 +18,7 @@ export function createCompetitionRouter(
   const router = Router();
 
   router.post('/', requireRole('admin'), validateBody(createCompetitionSchema), controller.create);
+  router.get('/', validateQuery(paginationQuerySchema), controller.list);
   router.get('/:id', controller.getById);
   // Cosmetic details only (currently just imageUrl) — never blocked by an
   // existing result, unlike /slots below.

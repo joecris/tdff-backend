@@ -1,4 +1,5 @@
 import { GrandTour } from '../entities/grand-tour.entity';
+import { PaginatedResult, PaginationParams } from '@shared/domain/pagination';
 
 /**
  * Owned here (domain layer, alongside the port) rather than in the use case
@@ -23,4 +24,5 @@ export interface CreateGrandTourInput {
 export interface GrandTourServicePort {
   createGrandTour(input: CreateGrandTourInput): Promise<GrandTour>;
   getGrandTourById(id: string): Promise<GrandTour>;
+  listGrandTours(params: PaginationParams): Promise<PaginatedResult<GrandTour>>;
 }

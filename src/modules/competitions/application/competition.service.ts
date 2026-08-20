@@ -16,8 +16,10 @@ import { FantasyLeagueServicePort } from '@modules/fantasy-leagues/domain/ports/
 import { UserServicePort } from '@modules/user/domain/ports/user-service.port';
 import { GrandTourParticipationServicePort } from '@modules/grand-tours/domain/ports/grand-tour-participation-service.port';
 import { ScoringServicePort } from '@modules/scoring/domain/ports/scoring-service.port';
+import { PaginatedResult, PaginationParams } from '@shared/domain/pagination';
 import { CreateCompetitionUseCase } from './use-cases/create-competition.usecase';
 import { GetCompetitionUseCase } from './use-cases/get-competition.usecase';
+import { ListCompetitionsUseCase } from './use-cases/list-competitions.usecase';
 import { UpdateCompetitionSlotsUseCase } from './use-cases/update-competition-slots.usecase';
 import { UpdateCompetitionDetailsUseCase } from './use-cases/update-competition-details.usecase';
 import { SubmitCompetitionEntryUseCase } from './use-cases/submit-competition-entry.usecase';
@@ -28,6 +30,7 @@ import { SubmitCompetitionResultsUseCase } from './use-cases/submit-competition-
 export class CompetitionService implements CompetitionServicePort {
   private readonly createCompetitionUseCase: CreateCompetitionUseCase;
   private readonly getCompetitionUseCase: GetCompetitionUseCase;
+  private readonly listCompetitionsUseCase: ListCompetitionsUseCase;
   private readonly updateCompetitionSlotsUseCase: UpdateCompetitionSlotsUseCase;
   private readonly updateCompetitionDetailsUseCase: UpdateCompetitionDetailsUseCase;
   private readonly submitEntryUseCase: SubmitCompetitionEntryUseCase;
@@ -49,6 +52,7 @@ export class CompetitionService implements CompetitionServicePort {
       fantasyLeagueService,
     );
     this.getCompetitionUseCase = new GetCompetitionUseCase(competitionRepository);
+    this.listCompetitionsUseCase = new ListCompetitionsUseCase(competitionRepository);
     this.updateCompetitionSlotsUseCase = new UpdateCompetitionSlotsUseCase(
       competitionRepository,
       resultRepository,
@@ -84,6 +88,10 @@ export class CompetitionService implements CompetitionServicePort {
 
   getCompetitionById(id: string): Promise<Competition> {
     return this.getCompetitionUseCase.execute(id);
+  }
+
+  listCompetitions(params: PaginationParams): Promise<PaginatedResult<Competition>> {
+    return this.listCompetitionsUseCase.execute(params);
   }
 
   updateCompetitionSlots(input: UpdateCompetitionSlotsInput): Promise<Competition> {

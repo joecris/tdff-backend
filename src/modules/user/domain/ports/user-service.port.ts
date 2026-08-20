@@ -1,4 +1,5 @@
 import { User, UserRole } from '../entities/user.entity';
+import { PaginatedResult, PaginationParams } from '@shared/domain/pagination';
 
 /**
  * Owned here (domain layer, alongside the port) rather than in the use case
@@ -26,4 +27,5 @@ export interface CreateUserInput {
 export interface UserServicePort {
   createUser(input: CreateUserInput): Promise<User>;
   getUserById(id: string): Promise<User>;
+  listUsers(params: PaginationParams): Promise<PaginatedResult<User>>;
 }

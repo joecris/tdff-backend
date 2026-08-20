@@ -1,9 +1,10 @@
-import { eq } from 'drizzle-orm';
+import { count, desc, eq } from 'drizzle-orm';
 import { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import { Team } from '../../../domain/entities/team.entity';
 import { TeamRepositoryPort } from '../../../domain/ports/team-repository.port';
 import { teamsTable } from '@infrastructure/db/schema/team.schema';
 import * as schema from '@infrastructure/db/schema';
+import { PaginationParams } from '@shared/domain/pagination';
 import { TeamMapper } from './mappers/team.mapper';
 
 export class DrizzleTeamRepository implements TeamRepositoryPort {
@@ -21,6 +22,21 @@ export class DrizzleTeamRepository implements TeamRepositoryPort {
       .where(eq(teamsTable.name, name.trim()))
       .limit(1);
     return row ? TeamMapper.toDomain(row) : null;
+  }
+
+  async findMany(params: PaginationParams): Promise<{ items: Team[]; total: number }> {
+    const offset = (params.page - 1) * params.limit;
+    const [rows, [totalRow]] = await Promise.all([
+      this.db
+        .select()
+        .from(teamsTable)
+        .orderBy(desc(teamsTable.createdAt))
+        .limit(params.limit)
+        .offset(offset),
+      this.db.select({ value: count() }).from(teamsTable),
+    ]);
+
+    return { items: rows.map(TeamMapper.toDomain), total: totalRow?.value ?? 0 };
   }
 
   async save(team: Team): Promise<void> {

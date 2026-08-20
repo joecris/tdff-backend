@@ -1,7 +1,11 @@
 import { z } from 'zod';
 import { registry, idPathParam, standardErrorResponses } from '@infrastructure/openapi/registry';
+import { paginationQuerySchema } from '@shared/http/pagination.dto';
 import { createGrandTourSchema } from './dto/create-grand-tour.dto';
-import { grandTourResponseSchema } from './dto/grand-tour-response.dto';
+import {
+  grandTourResponseSchema,
+  paginatedGrandTourResponseSchema,
+} from './dto/grand-tour-response.dto';
 import { addGrandTourTeamSchema } from './dto/add-grand-tour-team.dto';
 import { grandTourTeamResponseSchema } from './dto/grand-tour-team-response.dto';
 import { addGrandTourRiderSchema } from './dto/add-grand-tour-rider.dto';
@@ -26,6 +30,24 @@ registry.registerPath({
       content: { 'application/json': { schema: grandTourResponseSchema } },
     },
     ...standardErrorResponses([400, 401, 403]),
+  },
+});
+
+registry.registerPath({
+  method: 'get',
+  path: '/api/grand-tours',
+  operationId: 'listGrandTours',
+  tags: ['Grand Tours'],
+  summary: 'List grand tours (paginated)',
+  security: [],
+  description: 'Defaults to 50 items/page (max 100).',
+  request: { query: paginationQuerySchema },
+  responses: {
+    200: {
+      description: 'A page of grand tours',
+      content: { 'application/json': { schema: paginatedGrandTourResponseSchema } },
+    },
+    ...standardErrorResponses([400]),
   },
 });
 
