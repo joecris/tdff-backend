@@ -1,5 +1,7 @@
 import { z } from 'zod';
 import { User } from '../../../../domain/entities/user.entity';
+import { PaginatedResult } from '@shared/domain/pagination';
+import { paginatedResponseSchema } from '@shared/http/pagination.dto';
 
 // Mirrors `UserRole` (`src/shared/auth/role.ts`) — hardcoded rather than
 // derived because Zod enums need literal values, not a type; update both
@@ -14,6 +16,15 @@ export const userResponseSchema = z.object({
   updatedAt: z.iso.datetime(),
 });
 export type UserResponseDto = z.infer<typeof userResponseSchema>;
+
+export const paginatedUserResponseSchema = paginatedResponseSchema(userResponseSchema);
+export type PaginatedUserResponseDto = z.infer<typeof paginatedUserResponseSchema>;
+
+export function toPaginatedUserResponseDto(
+  result: PaginatedResult<User>,
+): PaginatedUserResponseDto {
+  return { ...result, items: result.items.map(toUserResponseDto) };
+}
 
 export function toUserResponseDto(user: User): UserResponseDto {
   return {

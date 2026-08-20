@@ -1,8 +1,10 @@
 import { User } from '../domain/entities/user.entity';
 import { UserRepositoryPort } from '../domain/ports/user-repository.port';
 import { CreateUserInput, UserServicePort } from '../domain/ports/user-service.port';
+import { PaginatedResult, PaginationParams } from '@shared/domain/pagination';
 import { CreateUserUseCase } from './use-cases/create-user.usecase';
 import { GetUserUseCase } from './use-cases/get-user.usecase';
+import { ListUsersUseCase } from './use-cases/list-users.usecase';
 
 /**
  * Implements the inbound port by delegating to individual use cases.
@@ -13,10 +15,12 @@ import { GetUserUseCase } from './use-cases/get-user.usecase';
 export class UserService implements UserServicePort {
   private readonly createUserUseCase: CreateUserUseCase;
   private readonly getUserUseCase: GetUserUseCase;
+  private readonly listUsersUseCase: ListUsersUseCase;
 
   constructor(userRepository: UserRepositoryPort) {
     this.createUserUseCase = new CreateUserUseCase(userRepository);
     this.getUserUseCase = new GetUserUseCase(userRepository);
+    this.listUsersUseCase = new ListUsersUseCase(userRepository);
   }
 
   createUser(input: CreateUserInput): Promise<User> {
@@ -25,5 +29,9 @@ export class UserService implements UserServicePort {
 
   getUserById(id: string): Promise<User> {
     return this.getUserUseCase.execute(id);
+  }
+
+  listUsers(params: PaginationParams): Promise<PaginatedResult<User>> {
+    return this.listUsersUseCase.execute(params);
   }
 }

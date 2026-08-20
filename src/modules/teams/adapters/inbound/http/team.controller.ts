@@ -1,8 +1,9 @@
 import { RequestHandler } from 'express';
 import { TeamServicePort } from '../../../domain/ports/team-service.port';
 import { ValidationError } from '@shared/errors/app-error';
+import { PaginationParams } from '@shared/domain/pagination';
 import { CreateTeamDto } from './dto/create-team.dto';
-import { toTeamResponseDto } from './dto/team-response.dto';
+import { toTeamResponseDto, toPaginatedTeamResponseDto } from './dto/team-response.dto';
 
 export class TeamController {
   constructor(private readonly teamService: TeamServicePort) {}
@@ -27,6 +28,15 @@ export class TeamController {
     try {
       const team = await this.teamService.getTeamById(req.params.id as string);
       res.status(200).json(toTeamResponseDto(team));
+    } catch (err) {
+      next(err);
+    }
+  };
+
+  list: RequestHandler = async (req, res, next) => {
+    try {
+      const result = await this.teamService.listTeams(req.pagination as PaginationParams);
+      res.status(200).json(toPaginatedTeamResponseDto(result));
     } catch (err) {
       next(err);
     }

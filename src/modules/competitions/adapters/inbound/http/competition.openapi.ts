@@ -1,7 +1,11 @@
 import { z } from 'zod';
 import { registry, idPathParam, standardErrorResponses } from '@infrastructure/openapi/registry';
+import { paginationQuerySchema } from '@shared/http/pagination.dto';
 import { createCompetitionSchema } from './dto/create-competition.dto';
-import { competitionResponseSchema } from './dto/competition-response.dto';
+import {
+  competitionResponseSchema,
+  paginatedCompetitionResponseSchema,
+} from './dto/competition-response.dto';
 import { updateCompetitionSlotsSchema } from './dto/update-competition-slots.dto';
 import { updateCompetitionDetailsSchema } from './dto/update-competition-details.dto';
 import { submitCompetitionEntrySchema } from './dto/submit-competition-entry.dto';
@@ -36,6 +40,24 @@ registry.registerPath({
       content: { 'application/json': { schema: competitionResponseSchema } },
     },
     ...standardErrorResponses([400, 401, 403, 404]),
+  },
+});
+
+registry.registerPath({
+  method: 'get',
+  path: '/api/competitions',
+  operationId: 'listCompetitions',
+  tags: ['Competitions'],
+  summary: 'List competitions (paginated)',
+  security: [],
+  description: 'Defaults to 50 items/page (max 100).',
+  request: { query: paginationQuerySchema },
+  responses: {
+    200: {
+      description: 'A page of competitions',
+      content: { 'application/json': { schema: paginatedCompetitionResponseSchema } },
+    },
+    ...standardErrorResponses([400]),
   },
 });
 

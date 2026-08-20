@@ -1,6 +1,8 @@
 import { Router } from 'express';
 import { validateBody } from '@infrastructure/http/middlewares/validate.middleware';
+import { validateQuery } from '@infrastructure/http/middlewares/validate-query.middleware';
 import { requireRole } from '@infrastructure/http/middlewares/require-role.middleware';
+import { paginationQuerySchema } from '@shared/http/pagination.dto';
 import { GrandTourController } from './grand-tour.controller';
 import { GrandTourParticipationController } from './grand-tour-participation.controller';
 import { createGrandTourSchema } from './dto/create-grand-tour.dto';
@@ -17,6 +19,8 @@ export function createGrandTourRouter(
   // left open; grand tour setup belongs in the same "admin manages" bucket
   // as the start-list routes right below it.
   router.post('/', requireRole('admin'), validateBody(createGrandTourSchema), controller.create);
+  // Public, same as GET /:id — reads stay open, "admin manages, users consume."
+  router.get('/', validateQuery(paginationQuerySchema), controller.list);
   router.get('/:id', controller.getById);
 
   router.post(

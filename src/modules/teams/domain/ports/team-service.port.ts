@@ -1,5 +1,6 @@
 import { Team } from '../entities/team.entity';
 import { BulkImportResult } from '@shared/excel/bulk-import-result';
+import { PaginatedResult, PaginationParams } from '@shared/domain/pagination';
 
 export interface CreateTeamInput {
   name: string;
@@ -16,5 +17,6 @@ export interface TeamServicePort {
   /** `null` for no match — see GetTeamByNameUseCase's doc comment for why
    * this one doesn't throw like `getTeamById`. */
   getTeamByName(name: string): Promise<Team | null>;
+  listTeams(params: PaginationParams): Promise<PaginatedResult<Team>>;
   bulkImportTeams(fileBuffer: Buffer): Promise<BulkImportResult>;
 }

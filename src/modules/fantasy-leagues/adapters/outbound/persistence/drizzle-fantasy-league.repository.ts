@@ -1,9 +1,10 @@
-import { eq } from 'drizzle-orm';
+import { count, desc, eq } from 'drizzle-orm';
 import { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import { FantasyLeague } from '../../../domain/entities/fantasy-league.entity';
 import { FantasyLeagueRepositoryPort } from '../../../domain/ports/fantasy-league-repository.port';
 import { fantasyLeaguesTable } from '@infrastructure/db/schema/fantasy-league.schema';
 import * as schema from '@infrastructure/db/schema';
+import { PaginationParams } from '@shared/domain/pagination';
 import { FantasyLeagueMapper } from './mappers/fantasy-league.mapper';
 
 export class DrizzleFantasyLeagueRepository implements FantasyLeagueRepositoryPort {
@@ -16,6 +17,21 @@ export class DrizzleFantasyLeagueRepository implements FantasyLeagueRepositoryPo
       .where(eq(fantasyLeaguesTable.id, id))
       .limit(1);
     return row ? FantasyLeagueMapper.toDomain(row) : null;
+  }
+
+  async findMany(params: PaginationParams): Promise<{ items: FantasyLeague[]; total: number }> {
+    const offset = (params.page - 1) * params.limit;
+    const [rows, [totalRow]] = await Promise.all([
+      this.db
+        .select()
+        .from(fantasyLeaguesTable)
+        .orderBy(desc(fantasyLeaguesTable.createdAt))
+        .limit(params.limit)
+        .offset(offset),
+      this.db.select({ value: count() }).from(fantasyLeaguesTable),
+    ]);
+
+    return { items: rows.map(FantasyLeagueMapper.toDomain), total: totalRow?.value ?? 0 };
   }
 
   async save(fantasyLeague: FantasyLeague): Promise<void> {

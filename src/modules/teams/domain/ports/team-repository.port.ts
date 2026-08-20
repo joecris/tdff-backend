@@ -1,4 +1,5 @@
 import { Team } from '../entities/team.entity';
+import { PaginationParams } from '@shared/domain/pagination';
 
 /**
  * Outbound port. The application layer depends on this interface only;
@@ -12,5 +13,6 @@ import { Team } from '../entities/team.entity';
 export interface TeamRepositoryPort {
   findById(id: string): Promise<Team | null>;
   findByName(name: string): Promise<Team | null>;
+  findMany(params: PaginationParams): Promise<{ items: Team[]; total: number }>;
   save(team: Team): Promise<void>;
 }

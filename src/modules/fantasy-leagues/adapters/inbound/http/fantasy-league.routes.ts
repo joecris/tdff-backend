@@ -1,6 +1,8 @@
 import { Router } from 'express';
 import { validateBody } from '@infrastructure/http/middlewares/validate.middleware';
+import { validateQuery } from '@infrastructure/http/middlewares/validate-query.middleware';
 import { requireRole } from '@infrastructure/http/middlewares/require-role.middleware';
+import { paginationQuerySchema } from '@shared/http/pagination.dto';
 import { FantasyLeagueController } from './fantasy-league.controller';
 import { ScoringController } from '@modules/scoring/adapters/inbound/http/scoring.controller';
 import { createFantasyLeagueSchema } from './dto/create-fantasy-league.dto';
@@ -17,6 +19,7 @@ export function createFantasyLeagueRouter(
     validateBody(createFantasyLeagueSchema),
     controller.create,
   );
+  router.get('/', validateQuery(paginationQuerySchema), controller.list);
   router.get('/:id', controller.getById);
 
   // Open to any authenticated user in v1 — no invite code or capacity cap

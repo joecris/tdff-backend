@@ -1,7 +1,9 @@
 import { Router } from 'express';
 import { validateBody } from '@infrastructure/http/middlewares/validate.middleware';
+import { validateQuery } from '@infrastructure/http/middlewares/validate-query.middleware';
 import { requireRole } from '@infrastructure/http/middlewares/require-role.middleware';
 import { uploadExcelFile } from '@infrastructure/http/middlewares/upload.middleware';
+import { paginationQuerySchema } from '@shared/http/pagination.dto';
 import { RiderController } from './rider.controller';
 import { createRiderSchema } from './dto/create-rider.dto';
 
@@ -9,6 +11,7 @@ export function createRiderRouter(controller: RiderController): Router {
   const router = Router();
 
   router.post('/', requireRole('admin'), validateBody(createRiderSchema), controller.create);
+  router.get('/', validateQuery(paginationQuerySchema), controller.list);
   router.get('/:id', controller.getById);
 
   // Phase 5 — bulk roster setup from a spreadsheet, same shape as teams'.

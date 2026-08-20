@@ -1,9 +1,10 @@
-import { eq } from 'drizzle-orm';
+import { count, desc, eq } from 'drizzle-orm';
 import { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import { User } from '../../../domain/entities/user.entity';
 import { UserRepositoryPort } from '../../../domain/ports/user-repository.port';
 import { usersTable } from '@infrastructure/db/schema/user.schema';
 import * as schema from '@infrastructure/db/schema';
+import { PaginationParams } from '@shared/domain/pagination';
 import { UserMapper } from './mappers/user.mapper';
 
 /**
@@ -39,6 +40,21 @@ export class DrizzleUserRepository implements UserRepositoryPort {
       .limit(1);
 
     return row ? UserMapper.toDomain(row) : null;
+  }
+
+  async findMany(params: PaginationParams): Promise<{ items: User[]; total: number }> {
+    const offset = (params.page - 1) * params.limit;
+    const [rows, [totalRow]] = await Promise.all([
+      this.db
+        .select()
+        .from(usersTable)
+        .orderBy(desc(usersTable.createdAt))
+        .limit(params.limit)
+        .offset(offset),
+      this.db.select({ value: count() }).from(usersTable),
+    ]);
+
+    return { items: rows.map(UserMapper.toDomain), total: totalRow?.value ?? 0 };
   }
 
   async save(user: User): Promise<void> {

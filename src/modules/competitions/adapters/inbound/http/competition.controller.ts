@@ -1,12 +1,16 @@
 import { RequestHandler } from 'express';
 import { CompetitionServicePort } from '../../../domain/ports/competition-service.port';
 import { UnauthorizedError } from '@shared/errors/app-error';
+import { PaginationParams } from '@shared/domain/pagination';
 import { CreateCompetitionDto } from './dto/create-competition.dto';
 import { UpdateCompetitionSlotsDto } from './dto/update-competition-slots.dto';
 import { UpdateCompetitionDetailsDto } from './dto/update-competition-details.dto';
 import { SubmitCompetitionEntryDto } from './dto/submit-competition-entry.dto';
 import { SubmitCompetitionResultsDto } from './dto/submit-competition-results.dto';
-import { toCompetitionResponseDto } from './dto/competition-response.dto';
+import {
+  toCompetitionResponseDto,
+  toPaginatedCompetitionResponseDto,
+} from './dto/competition-response.dto';
 import { toCompetitionEntryResponseDto } from './dto/competition-entry-response.dto';
 import { toCompetitionResultResponseDto } from './dto/competition-result-response.dto';
 
@@ -35,6 +39,17 @@ export class CompetitionController {
     try {
       const competition = await this.competitionService.getCompetitionById(req.params.id as string);
       res.status(200).json(toCompetitionResponseDto(competition));
+    } catch (err) {
+      next(err);
+    }
+  };
+
+  list: RequestHandler = async (req, res, next) => {
+    try {
+      const result = await this.competitionService.listCompetitions(
+        req.pagination as PaginationParams,
+      );
+      res.status(200).json(toPaginatedCompetitionResponseDto(result));
     } catch (err) {
       next(err);
     }

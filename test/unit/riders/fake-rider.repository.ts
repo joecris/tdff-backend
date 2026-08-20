@@ -1,5 +1,7 @@
 import { Rider } from '@modules/riders/domain/entities/rider.entity';
 import { RiderRepositoryPort } from '@modules/riders/domain/ports/rider-repository.port';
+import { PaginationParams } from '@shared/domain/pagination';
+import { paginateFake } from '../shared/paginate-fake';
 
 export class FakeRiderRepository implements RiderRepositoryPort {
   private readonly ridersById = new Map<string, Rider>();
@@ -13,6 +15,10 @@ export class FakeRiderRepository implements RiderRepositoryPort {
       if (rider.name === name.trim()) return rider;
     }
     return null;
+  }
+
+  async findMany(params: PaginationParams): Promise<{ items: Rider[]; total: number }> {
+    return paginateFake([...this.ridersById.values()], params, (r) => r.createdAt);
   }
 
   async save(rider: Rider): Promise<void> {

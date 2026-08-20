@@ -1,5 +1,7 @@
 import { z } from 'zod';
 import { Team } from '../../../../domain/entities/team.entity';
+import { PaginatedResult } from '@shared/domain/pagination';
+import { paginatedResponseSchema } from '@shared/http/pagination.dto';
 
 export const teamResponseSchema = z.object({
   id: z.uuid(),
@@ -18,4 +20,13 @@ export function toTeamResponseDto(team: Team): TeamResponseDto {
     createdAt: team.createdAt.toISOString(),
     updatedAt: team.updatedAt.toISOString(),
   };
+}
+
+export const paginatedTeamResponseSchema = paginatedResponseSchema(teamResponseSchema);
+export type PaginatedTeamResponseDto = z.infer<typeof paginatedTeamResponseSchema>;
+
+export function toPaginatedTeamResponseDto(
+  result: PaginatedResult<Team>,
+): PaginatedTeamResponseDto {
+  return { ...result, items: result.items.map(toTeamResponseDto) };
 }

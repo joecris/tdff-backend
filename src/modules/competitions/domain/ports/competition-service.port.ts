@@ -6,6 +6,7 @@ import {
 } from '../entities/competition.entity';
 import { CompetitionEntry } from '../entities/competition-entry.entity';
 import { CompetitionResult } from '../entities/competition-result.entity';
+import { PaginatedResult, PaginationParams } from '@shared/domain/pagination';
 
 export interface CreateCompetitionInput {
   name: string;
@@ -48,6 +49,7 @@ export interface SubmitCompetitionResultsInput {
 export interface CompetitionServicePort {
   createCompetition(input: CreateCompetitionInput): Promise<Competition>;
   getCompetitionById(id: string): Promise<Competition>;
+  listCompetitions(params: PaginationParams): Promise<PaginatedResult<Competition>>;
   /** Rejects with `CompetitionResultsAlreadySubmittedError` once a result
    * exists — reshaping required slots/points after scoring has happened
    * would silently invalidate already-computed scores. */

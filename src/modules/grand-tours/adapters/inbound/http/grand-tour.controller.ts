@@ -1,7 +1,11 @@
 import { RequestHandler } from 'express';
 import { GrandTourServicePort } from '../../../domain/ports/grand-tour-service.port';
+import { PaginationParams } from '@shared/domain/pagination';
 import { CreateGrandTourDto } from './dto/create-grand-tour.dto';
-import { toGrandTourResponseDto } from './dto/grand-tour-response.dto';
+import {
+  toGrandTourResponseDto,
+  toPaginatedGrandTourResponseDto,
+} from './dto/grand-tour-response.dto';
 
 /**
  * Inbound HTTP adapter. Depends only on the GrandTourServicePort interface —
@@ -33,6 +37,15 @@ export class GrandTourController {
     try {
       const grandTour = await this.grandTourService.getGrandTourById(req.params.id as string);
       res.status(200).json(toGrandTourResponseDto(grandTour));
+    } catch (err) {
+      next(err);
+    }
+  };
+
+  list: RequestHandler = async (req, res, next) => {
+    try {
+      const result = await this.grandTourService.listGrandTours(req.pagination as PaginationParams);
+      res.status(200).json(toPaginatedGrandTourResponseDto(result));
     } catch (err) {
       next(err);
     }

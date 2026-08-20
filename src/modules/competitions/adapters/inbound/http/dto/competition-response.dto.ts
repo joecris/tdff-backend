@@ -1,5 +1,7 @@
 import { z } from 'zod';
 import { Competition } from '../../../../domain/entities/competition.entity';
+import { PaginatedResult } from '@shared/domain/pagination';
+import { paginatedResponseSchema } from '@shared/http/pagination.dto';
 
 export const competitionSlotConfigResponseSchema = z.object({
   slot: z.string(),
@@ -36,4 +38,14 @@ export function toCompetitionResponseDto(competition: Competition): CompetitionR
     createdAt: competition.createdAt.toISOString(),
     updatedAt: competition.updatedAt.toISOString(),
   };
+}
+
+export const paginatedCompetitionResponseSchema =
+  paginatedResponseSchema(competitionResponseSchema);
+export type PaginatedCompetitionResponseDto = z.infer<typeof paginatedCompetitionResponseSchema>;
+
+export function toPaginatedCompetitionResponseDto(
+  result: PaginatedResult<Competition>,
+): PaginatedCompetitionResponseDto {
+  return { ...result, items: result.items.map(toCompetitionResponseDto) };
 }

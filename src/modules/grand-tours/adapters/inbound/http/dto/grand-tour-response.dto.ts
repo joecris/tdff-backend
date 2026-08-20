@@ -1,6 +1,8 @@
 import { z } from 'zod';
 import { GrandTour } from '../../../../domain/entities/grand-tour.entity';
 import { formatDdMmYyyy } from '@shared/utils/date-format';
+import { PaginatedResult } from '@shared/domain/pagination';
+import { paginatedResponseSchema } from '@shared/http/pagination.dto';
 
 export const grandTourResponseSchema = z.object({
   id: z.uuid(),
@@ -25,4 +27,13 @@ export function toGrandTourResponseDto(grandTour: GrandTour): GrandTourResponseD
     createdAt: grandTour.createdAt.toISOString(),
     updatedAt: grandTour.updatedAt.toISOString(),
   };
+}
+
+export const paginatedGrandTourResponseSchema = paginatedResponseSchema(grandTourResponseSchema);
+export type PaginatedGrandTourResponseDto = z.infer<typeof paginatedGrandTourResponseSchema>;
+
+export function toPaginatedGrandTourResponseDto(
+  result: PaginatedResult<GrandTour>,
+): PaginatedGrandTourResponseDto {
+  return { ...result, items: result.items.map(toGrandTourResponseDto) };
 }
