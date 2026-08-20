@@ -1,13 +1,22 @@
 import { writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { Workbook } from 'exceljs';
-import { ExcelColumn } from './parse-worksheet';
+import { ExcelColumn } from '@shared/excel/parse-worksheet';
 import { TEAM_COLUMNS } from '@modules/teams/application/team-excel-parser';
 import { RIDER_COLUMNS } from '@modules/riders/application/rider-excel-parser';
 
 const SAMPLES_DIR = join(__dirname, '..', '..', '..', 'samples');
 
 /**
+ * Repo-maintenance CLI script, not shared library code — lives under
+ * `infrastructure/` (same reasoning as `openapi/generate-spec.ts` and
+ * `db/seed/index.ts`: a one-off tool with real side effects, unconditional
+ * `main()` call, nothing a unit test should be asserting against) rather
+ * than `shared/excel/`, which sits inside `vitest.config.mts`'s coverage
+ * `include` glob. It lived there briefly and dragged the lines-coverage
+ * threshold down by ~77 always-uncovered lines — moving it here is the fix,
+ * not adding tests for a script that only makes sense to run by hand.
+ *
  * Builds one sample .xlsx from a column list + example rows — headers come
  * straight from `TEAM_COLUMNS`/`RIDER_COLUMNS`, the same arrays
  * `parseWorksheetRows` matches against, so this can never drift out of
