@@ -24,6 +24,7 @@ export class CompetitionMapper {
       slots: slotConfigRows.map((r) => ({ slot: r.slot as SelectionSlot, points: r.points })),
       // Drizzle nullable columns are `T | null`, not `T | undefined`.
       ...(row.description !== null ? { description: row.description } : {}),
+      ...(row.imageUrl !== null ? { imageUrl: row.imageUrl } : {}),
       ...(row.entryLockAt !== null ? { entryLockAt: row.entryLockAt } : {}),
       createdAt: row.createdAt,
       updatedAt: row.updatedAt,
@@ -38,6 +39,7 @@ export class CompetitionMapper {
       type: props.type,
       fantasyLeagueId: props.fantasyLeagueId,
       ...(props.description !== undefined ? { description: props.description } : {}),
+      ...(props.imageUrl !== undefined ? { imageUrl: props.imageUrl } : {}),
       ...(props.entryLockAt !== undefined ? { entryLockAt: props.entryLockAt } : {}),
       createdAt: props.createdAt,
       updatedAt: props.updatedAt,

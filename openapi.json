@@ -1947,6 +1947,11 @@
                     "type": "string",
                     "format": "uuid"
                   },
+                  "imageUrl": {
+                    "type": "string",
+                    "maxLength": 500,
+                    "format": "uri"
+                  },
                   "entryLockAt": {
                     "type": [
                       "string",
@@ -2019,6 +2024,9 @@
                     "fantasyLeagueId": {
                       "type": "string",
                       "format": "uuid"
+                    },
+                    "imageUrl": {
+                      "type": "string"
                     },
                     "entryLockAt": {
                       "type": "string",
@@ -2153,6 +2161,9 @@
                       "type": "string",
                       "format": "uuid"
                     },
+                    "imageUrl": {
+                      "type": "string"
+                    },
                     "entryLockAt": {
                       "type": "string",
                       "format": "date-time"
@@ -2193,6 +2204,161 @@
                     "createdAt",
                     "updatedAt"
                   ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "operationId": "updateCompetitionDetails",
+        "tags": [
+          "Competitions"
+        ],
+        "summary": "Update a competition’s cosmetic details (currently just imageUrl)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "description": "Requires `admin` role. Partial update — omitted fields are left untouched. Unlike `PUT /:id/slots`, never blocked by an existing result: a banner image doesn’t affect scoring.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "description": "Competition id"
+            },
+            "required": true,
+            "description": "Competition id",
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "imageUrl": {
+                    "type": "string",
+                    "maxLength": 500,
+                    "format": "uri"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated competition",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "description": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    },
+                    "fantasyLeagueId": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "imageUrl": {
+                      "type": "string"
+                    },
+                    "entryLockAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "slots": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "slot": {
+                            "type": "string"
+                          },
+                          "points": {
+                            "type": "integer"
+                          }
+                        },
+                        "required": [
+                          "slot",
+                          "points"
+                        ]
+                      }
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "name",
+                    "type",
+                    "fantasyLeagueId",
+                    "slots",
+                    "createdAt",
+                    "updatedAt"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No valid credential on the request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Caller doesn't have the required role",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -2304,6 +2470,9 @@
                     "fantasyLeagueId": {
                       "type": "string",
                       "format": "uuid"
+                    },
+                    "imageUrl": {
+                      "type": "string"
                     },
                     "entryLockAt": {
                       "type": "string",

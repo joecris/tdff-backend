@@ -3,6 +3,7 @@ import { CompetitionServicePort } from '../../../domain/ports/competition-servic
 import { UnauthorizedError } from '@shared/errors/app-error';
 import { CreateCompetitionDto } from './dto/create-competition.dto';
 import { UpdateCompetitionSlotsDto } from './dto/update-competition-slots.dto';
+import { UpdateCompetitionDetailsDto } from './dto/update-competition-details.dto';
 import { SubmitCompetitionEntryDto } from './dto/submit-competition-entry.dto';
 import { SubmitCompetitionResultsDto } from './dto/submit-competition-results.dto';
 import { toCompetitionResponseDto } from './dto/competition-response.dto';
@@ -21,6 +22,7 @@ export class CompetitionController {
         fantasyLeagueId: dto.fantasyLeagueId,
         slots: dto.slots,
         ...(dto.description !== undefined ? { description: dto.description } : {}),
+        ...(dto.imageUrl !== undefined ? { imageUrl: dto.imageUrl } : {}),
         ...(dto.entryLockAt !== undefined ? { entryLockAt: dto.entryLockAt } : {}),
       });
       res.status(201).json(toCompetitionResponseDto(competition));
@@ -44,6 +46,19 @@ export class CompetitionController {
       const competition = await this.competitionService.updateCompetitionSlots({
         competitionId: req.params.id as string,
         slots: dto.slots,
+      });
+      res.status(200).json(toCompetitionResponseDto(competition));
+    } catch (err) {
+      next(err);
+    }
+  };
+
+  updateDetails: RequestHandler = async (req, res, next) => {
+    try {
+      const dto = req.body as UpdateCompetitionDetailsDto;
+      const competition = await this.competitionService.updateCompetitionDetails({
+        competitionId: req.params.id as string,
+        ...(dto.imageUrl !== undefined ? { imageUrl: dto.imageUrl } : {}),
       });
       res.status(200).json(toCompetitionResponseDto(competition));
     } catch (err) {

@@ -23,6 +23,7 @@ export class CreateCompetitionUseCase {
       fantasyLeagueId: input.fantasyLeagueId,
       slots: input.slots,
       ...(input.description !== undefined ? { description: input.description } : {}),
+      ...(input.imageUrl !== undefined ? { imageUrl: input.imageUrl } : {}),
       ...(input.entryLockAt !== undefined ? { entryLockAt: input.entryLockAt } : {}),
     });
 

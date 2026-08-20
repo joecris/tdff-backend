@@ -13,6 +13,7 @@ export const competitionResponseSchema = z.object({
   description: z.string().optional(),
   type: z.string(),
   fantasyLeagueId: z.uuid(),
+  imageUrl: z.string().optional(),
   entryLockAt: z.iso.datetime().optional(),
   slots: z.array(competitionSlotConfigResponseSchema),
   createdAt: z.iso.datetime(),
@@ -28,6 +29,7 @@ export function toCompetitionResponseDto(competition: Competition): CompetitionR
     fantasyLeagueId: competition.fantasyLeagueId,
     slots: competition.slots,
     ...(competition.description !== undefined ? { description: competition.description } : {}),
+    ...(competition.imageUrl !== undefined ? { imageUrl: competition.imageUrl } : {}),
     ...(competition.entryLockAt !== undefined
       ? { entryLockAt: competition.entryLockAt.toISOString() }
       : {}),

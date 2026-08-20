@@ -3,6 +3,7 @@ import { registry, idPathParam, standardErrorResponses } from '@infrastructure/o
 import { createCompetitionSchema } from './dto/create-competition.dto';
 import { competitionResponseSchema } from './dto/competition-response.dto';
 import { updateCompetitionSlotsSchema } from './dto/update-competition-slots.dto';
+import { updateCompetitionDetailsSchema } from './dto/update-competition-details.dto';
 import { submitCompetitionEntrySchema } from './dto/submit-competition-entry.dto';
 import { competitionEntryResponseSchema } from './dto/competition-entry-response.dto';
 import { submitCompetitionResultsSchema } from './dto/submit-competition-results.dto';
@@ -52,6 +53,29 @@ registry.registerPath({
       content: { 'application/json': { schema: competitionResponseSchema } },
     },
     ...standardErrorResponses([404]),
+  },
+});
+
+registry.registerPath({
+  method: 'put',
+  path: '/api/competitions/{id}',
+  operationId: 'updateCompetitionDetails',
+  tags: ['Competitions'],
+  summary: 'Update a competition’s cosmetic details (currently just imageUrl)',
+  security: [{ bearerAuth: [] }],
+  description:
+    'Requires `admin` role. Partial update — omitted fields are left untouched. Unlike ' +
+    '`PUT /:id/slots`, never blocked by an existing result: a banner image doesn’t affect scoring.',
+  request: {
+    params: competitionIdParam,
+    body: { content: { 'application/json': { schema: updateCompetitionDetailsSchema } } },
+  },
+  responses: {
+    200: {
+      description: 'Updated competition',
+      content: { 'application/json': { schema: competitionResponseSchema } },
+    },
+    ...standardErrorResponses([400, 401, 403, 404]),
   },
 });
 

@@ -19,6 +19,10 @@ export const competitionsTable = pgTable(
     fantasyLeagueId: uuid('fantasy_league_id')
       .notNull()
       .references(() => fantasyLeaguesTable.id),
+    // Cosmetic — a banner/thumbnail for this competition, same treatment
+    // as teams.logo_url/riders.image_url (plain nullable varchar, no
+    // format enforcement at the DB level).
+    imageUrl: varchar('image_url', { length: 500 }),
     // Provisioned, not enforced in v1 — see plan's "Entry lock deadline" default.
     entryLockAt: timestamp('entry_lock_at', { withTimezone: true }),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
