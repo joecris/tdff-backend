@@ -5,6 +5,7 @@ import { CompetitionController } from './competition.controller';
 import { ScoringController } from '@modules/scoring/adapters/inbound/http/scoring.controller';
 import { createCompetitionSchema } from './dto/create-competition.dto';
 import { updateCompetitionSlotsSchema } from './dto/update-competition-slots.dto';
+import { updateCompetitionDetailsSchema } from './dto/update-competition-details.dto';
 import { submitCompetitionEntrySchema } from './dto/submit-competition-entry.dto';
 import { submitCompetitionResultsSchema } from './dto/submit-competition-results.dto';
 
@@ -16,6 +17,14 @@ export function createCompetitionRouter(
 
   router.post('/', requireRole('admin'), validateBody(createCompetitionSchema), controller.create);
   router.get('/:id', controller.getById);
+  // Cosmetic details only (currently just imageUrl) — never blocked by an
+  // existing result, unlike /slots below.
+  router.put(
+    '/:id',
+    requireRole('admin'),
+    validateBody(updateCompetitionDetailsSchema),
+    controller.updateDetails,
+  );
   // Reshaping required slots/points — rejected once a result exists (see
   // UpdateCompetitionSlotsUseCase).
   router.put(

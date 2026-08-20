@@ -96,3 +96,60 @@ describe('Competition slot config validation', () => {
     expect(competition.slots).toEqual([{ slot: 'top_1', points: 10 }]);
   });
 });
+
+describe('Competition.updateDetails (imageUrl)', () => {
+  it('trims and sets imageUrl on create', () => {
+    const competition = Competition.create({
+      ...baseProps(),
+      slots: [{ slot: 'top_1', points: 10 }],
+      imageUrl: '  https://example.com/banner.png  ',
+    });
+
+    expect(competition.imageUrl).toBe('https://example.com/banner.png');
+  });
+
+  it('leaves imageUrl undefined when not provided', () => {
+    const competition = Competition.create({
+      ...baseProps(),
+      slots: [{ slot: 'top_1', points: 10 }],
+    });
+
+    expect(competition.imageUrl).toBeUndefined();
+  });
+
+  it('updateDetails sets imageUrl and bumps updatedAt', () => {
+    const competition = Competition.create({
+      ...baseProps(),
+      slots: [{ slot: 'top_1', points: 10 }],
+    });
+    const before = competition.updatedAt;
+
+    competition.updateDetails({ imageUrl: 'https://example.com/new-banner.png' });
+
+    expect(competition.imageUrl).toBe('https://example.com/new-banner.png');
+    expect(competition.updatedAt.getTime()).toBeGreaterThanOrEqual(before.getTime());
+  });
+
+  it('updateDetails with an empty updates object leaves imageUrl untouched', () => {
+    const competition = Competition.create({
+      ...baseProps(),
+      slots: [{ slot: 'top_1', points: 10 }],
+      imageUrl: 'https://example.com/original.png',
+    });
+
+    competition.updateDetails({});
+
+    expect(competition.imageUrl).toBe('https://example.com/original.png');
+  });
+
+  it('updateDetails never touches slots', () => {
+    const competition = Competition.create({
+      ...baseProps(),
+      slots: [{ slot: 'top_1', points: 10 }],
+    });
+
+    competition.updateDetails({ imageUrl: 'https://example.com/banner.png' });
+
+    expect(competition.slots).toEqual([{ slot: 'top_1', points: 10 }]);
+  });
+});

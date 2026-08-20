@@ -22,12 +22,27 @@ describe('CreateCompetitionUseCase', () => {
       name: 'King of the Mountain',
       type: 'mountains',
       fantasyLeagueId: league.id,
+      imageUrl: 'https://example.com/kom.png',
       slots: [{ slot: 'climber', points: 10 }],
     });
 
     expect(competition.name).toBe('King of the Mountain');
     expect(competition.type).toBe('mountains');
     expect(competition.fantasyLeagueId).toBe(league.id);
+    expect(competition.imageUrl).toBe('https://example.com/kom.png');
+  });
+
+  it('leaves imageUrl undefined when omitted', async () => {
+    const { league } = await seedGrandTourAndLeague(fixture);
+
+    const competition = await useCase.execute({
+      name: 'King of the Mountain',
+      type: 'mountains',
+      fantasyLeagueId: league.id,
+      slots: [{ slot: 'climber', points: 10 }],
+    });
+
+    expect(competition.imageUrl).toBeUndefined();
   });
 
   it('throws FantasyLeagueNotFoundError for an unknown fantasyLeagueId', async () => {

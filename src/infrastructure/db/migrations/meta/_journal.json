@@ -57,6 +57,13 @@
       "when": 1787099101766,
       "tag": "0007_new_robin_chapel",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1787199942428,
+      "tag": "0008_known_stellaris",
+      "breakpoints": true
     }
   ]
 }

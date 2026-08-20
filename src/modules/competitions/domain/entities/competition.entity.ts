@@ -28,6 +28,7 @@ export interface CompetitionProps {
   description?: string;
   type: CompetitionType;
   fantasyLeagueId: string;
+  imageUrl?: string;
   entryLockAt?: Date;
   slots: CompetitionSlotConfig[];
   createdAt: Date;
@@ -55,6 +56,7 @@ export class Competition extends BaseEntity<string> {
     description?: string;
     type: CompetitionType;
     fantasyLeagueId: string;
+    imageUrl?: string;
     entryLockAt?: Date;
     slots: CompetitionSlotConfig[];
   }): Competition {
@@ -68,6 +70,7 @@ export class Competition extends BaseEntity<string> {
       fantasyLeagueId: props.fantasyLeagueId,
       slots: props.slots,
       ...(props.description !== undefined ? { description: props.description.trim() } : {}),
+      ...(props.imageUrl !== undefined ? { imageUrl: props.imageUrl.trim() } : {}),
       ...(props.entryLockAt !== undefined ? { entryLockAt: props.entryLockAt } : {}),
       createdAt: now,
       updatedAt: now,
@@ -105,6 +108,15 @@ export class Competition extends BaseEntity<string> {
     this.props.updatedAt = new Date();
   }
 
+  /** Partial-update pattern — same shape as `Team`/`GrandTour`'s
+   * `updateDetails`. Only `imageUrl` is editable this way today; scoped
+   * to what's actually needed rather than opening up `name`/`type`/etc.
+   * before there's a real use for it. */
+  updateDetails(updates: { imageUrl?: string }): void {
+    if (updates.imageUrl !== undefined) this.props.imageUrl = updates.imageUrl.trim();
+    this.props.updatedAt = new Date();
+  }
+
   get name(): string {
     return this.props.name;
   }
@@ -119,6 +131,10 @@ export class Competition extends BaseEntity<string> {
 
   get fantasyLeagueId(): string {
     return this.props.fantasyLeagueId;
+  }
+
+  get imageUrl(): string | undefined {
+    return this.props.imageUrl;
   }
 
   get entryLockAt(): Date | undefined {

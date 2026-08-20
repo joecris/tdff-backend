@@ -23,6 +23,7 @@ export const createCompetitionSchema = z.object({
   description: z.string().min(1).max(500).optional(),
   type: z.string().min(1).max(50),
   fantasyLeagueId: z.uuid(),
+  imageUrl: z.url().max(500).optional(),
   entryLockAt: z.coerce.date().optional(),
   slots: z.array(slotConfigSchema).min(1),
 });

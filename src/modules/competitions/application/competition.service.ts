@@ -9,6 +9,7 @@ import {
   CreateCompetitionInput,
   SubmitCompetitionEntryInput,
   SubmitCompetitionResultsInput,
+  UpdateCompetitionDetailsInput,
   UpdateCompetitionSlotsInput,
 } from '../domain/ports/competition-service.port';
 import { FantasyLeagueServicePort } from '@modules/fantasy-leagues/domain/ports/fantasy-league-service.port';
@@ -18,6 +19,7 @@ import { ScoringServicePort } from '@modules/scoring/domain/ports/scoring-servic
 import { CreateCompetitionUseCase } from './use-cases/create-competition.usecase';
 import { GetCompetitionUseCase } from './use-cases/get-competition.usecase';
 import { UpdateCompetitionSlotsUseCase } from './use-cases/update-competition-slots.usecase';
+import { UpdateCompetitionDetailsUseCase } from './use-cases/update-competition-details.usecase';
 import { SubmitCompetitionEntryUseCase } from './use-cases/submit-competition-entry.usecase';
 import { GetCompetitionEntryUseCase } from './use-cases/get-competition-entry.usecase';
 import { ListCompetitionEntriesUseCase } from './use-cases/list-competition-entries.usecase';
@@ -27,6 +29,7 @@ export class CompetitionService implements CompetitionServicePort {
   private readonly createCompetitionUseCase: CreateCompetitionUseCase;
   private readonly getCompetitionUseCase: GetCompetitionUseCase;
   private readonly updateCompetitionSlotsUseCase: UpdateCompetitionSlotsUseCase;
+  private readonly updateCompetitionDetailsUseCase: UpdateCompetitionDetailsUseCase;
   private readonly submitEntryUseCase: SubmitCompetitionEntryUseCase;
   private readonly getEntryUseCase: GetCompetitionEntryUseCase;
   private readonly listEntriesUseCase: ListCompetitionEntriesUseCase;
@@ -49,6 +52,9 @@ export class CompetitionService implements CompetitionServicePort {
     this.updateCompetitionSlotsUseCase = new UpdateCompetitionSlotsUseCase(
       competitionRepository,
       resultRepository,
+    );
+    this.updateCompetitionDetailsUseCase = new UpdateCompetitionDetailsUseCase(
+      competitionRepository,
     );
     this.submitEntryUseCase = new SubmitCompetitionEntryUseCase(
       entryRepository,
@@ -82,6 +88,10 @@ export class CompetitionService implements CompetitionServicePort {
 
   updateCompetitionSlots(input: UpdateCompetitionSlotsInput): Promise<Competition> {
     return this.updateCompetitionSlotsUseCase.execute(input);
+  }
+
+  updateCompetitionDetails(input: UpdateCompetitionDetailsInput): Promise<Competition> {
+    return this.updateCompetitionDetailsUseCase.execute(input);
   }
 
   submitEntry(input: SubmitCompetitionEntryInput): Promise<CompetitionEntry> {
