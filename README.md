@@ -210,12 +210,22 @@ curl localhost:3000/api/competitions/<id>/scores    # public — everyone's comp
 
 ### Excel bulk import (teams/riders)
 
+Sample templates with the correct headers and a few example rows (incl.
+the optional columns left blank, to show they're genuinely optional) are
+committed at [`samples/teams-import-template.xlsx`](samples/teams-import-template.xlsx)
+and [`samples/riders-import-template.xlsx`](samples/riders-import-template.xlsx)
+— duplicate one, edit the rows, import. They're generated from the exact
+same column list the parser validates against (`TEAM_COLUMNS`/
+`RIDER_COLUMNS`), so they can't drift out of sync with what the API
+actually accepts; regenerate with `npm run templates:generate` if those
+ever change.
+
 ```bash
 # [admin] — .xlsx only, multipart field name "file"
 curl -X POST localhost:3000/api/teams/import -H 'x-user-id: <adminId>' \
-  -F 'file=@teams.xlsx'
+  -F 'file=@samples/teams-import-template.xlsx'
 curl -X POST localhost:3000/api/riders/import -H 'x-user-id: <adminId>' \
-  -F 'file=@riders.xlsx'
+  -F 'file=@samples/riders-import-template.xlsx'
 ```
 
 Expected columns (case-insensitive, any order):

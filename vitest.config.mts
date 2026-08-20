@@ -21,8 +21,15 @@ export default defineConfig({
       exclude: [
         // Type-only/port files and DTO shape declarations have nothing to
         // execute — coverage on them is meaningless noise, not signal.
+        // Two patterns because DTOs show up two ways in this codebase:
+        // most live under a module's own `dto/` folder, but a couple of
+        // shared ones (e.g. `shared/http/pagination.dto.ts`) sit directly
+        // in `shared/` without one — match by filename too so a DTO
+        // added outside a `dto/` folder doesn't silently start dragging
+        // the threshold down again.
         'src/**/*.port.ts',
         'src/**/dto/**',
+        'src/**/*.dto.ts',
       ],
       // v1 baseline (set just below the actual measured numbers at the
       // time this was added), not an aspirational target — a floor that

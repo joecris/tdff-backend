@@ -16,7 +16,10 @@ const riderRowSchema = z.object({
 
 type RiderRow = z.infer<typeof riderRowSchema>;
 
-const RIDER_COLUMNS: ExcelColumn<RiderRow>[] = [
+// Exported so `generate-import-templates.ts` can build a sample .xlsx with
+// headers guaranteed to match what this parser actually expects — same
+// reasoning as `TEAM_COLUMNS`.
+export const RIDER_COLUMNS: ExcelColumn<RiderRow>[] = [
   { header: 'Name', field: 'name', required: true },
   { header: 'Nationality', field: 'nationality', required: false },
   { header: 'Image URL', field: 'imageUrl', required: false },
