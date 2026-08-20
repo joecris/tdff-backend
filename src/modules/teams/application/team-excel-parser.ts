@@ -9,7 +9,10 @@ const teamRowSchema = z.object({
 
 export type TeamImportRow = z.infer<typeof teamRowSchema>;
 
-const TEAM_COLUMNS: ExcelColumn<TeamImportRow>[] = [
+// Exported so `generate-import-templates.ts` can build a sample .xlsx with
+// headers guaranteed to match what this parser actually expects — one
+// source of truth instead of a template that can silently drift from it.
+export const TEAM_COLUMNS: ExcelColumn<TeamImportRow>[] = [
   { header: 'Name', field: 'name', required: true },
   { header: 'Logo URL', field: 'logoUrl', required: false },
 ];

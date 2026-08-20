@@ -125,6 +125,9 @@ npm run test:integration      # real-Postgres tests — see test/integration/REA
 npm run db:generate            # generate a migration from schema changes
 npm run db:migrate               # apply migrations
 npm run db:seed                   # non-prod only; clears the DB, then seeds every module
+npm run openapi:generate           # regenerate openapi.json from the live Zod DTOs/routes
+npm run openapi:check               # CI's drift gate — fails if openapi.json is stale
+npm run templates:generate           # regenerate samples/*.xlsx from TEAM_COLUMNS/RIDER_COLUMNS
 ```
 
 ## Auth
